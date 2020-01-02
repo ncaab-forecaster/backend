@@ -1,0 +1,1 @@
+sudo docker run --rm --name postgres_dev -d -p 6000:5432 postgres
