@@ -165,57 +165,45 @@ def projections():
             games_with_names.append(game)
         return jsonify(games_with_names)
 
-        # return jsonify([
-        #     {
-        #         'id': 1,
-        #         'date': dt.today(),
-        #         'home_id': 1,
-        #         'away_id': 2,
-        #         'home_name': 'Gonzaga',
-        #         'away_name': 'Duke',
-        #         'home_score': 89,
-        #         'away_score': 67,
-        #         'home_projection': 92,
-        #         'away_projection': 85
-        #     },
-        #     {
-        #         'id': 2,
-        #         'date': dt.today(),
-        #         'home_id': 3,
-        #         'away_id': 4,
-        #         'home_name': 'Kansas',
-        #         'away_name': 'Oregon',
-        #         'home_score': 83,
-        #         'away_score': 62,
-        #         'home_projection': 91,
-        #         'away_projection': 62
-        #     },
-        #     {
-        #         'id': 2,
-        #         'date': dt.today(),
-        #         'home_id': 5,
-        #         'away_id': 6,
-        #         'home_name': 'Ohio State',
-        #         'away_name': 'Baylor',
-        #         'home_score': 67,
-        #         'away_score': 49,
-        #         'home_projection': 59,
-        #         'away_projection': 51
-        #     }
-        # ])
-
     elif home is None or away is None:
         return ("'home' and 'away' are necessary query parameters when not using the 'all' query parameter")
     else:
-        # Todo: Compare two random teams without inserting the game into the database
-        # Todo: Integrate DS API
+        rankings = Rankings()
+        rankings = rankings.current
+        print(home)
+        print(away)
+
+        home_team = db.session.query(Team).filter(
+            Team.id == home).first()
+        away_team = db.session.query(Team).filter(
+            Team.id == away).first()
+
+        print(home_team)
+        print(away_team)
+        data = {
+            "year": dt.today().year,
+            "month": dt.today().month,
+            "day": dt.today().day,
+            "home_name": home_team.name,
+            "home_rank": float(rankings.get(home_team.id.lower(), 0)),
+            "away_name": away_team.name,
+            "away_rank": float(rankings.get(away_team.id.lower(), 0))
+        }
+
+        res = requests.post(
+            "http://ncaab.herokuapp.com/", data=json.dumps(data))
+        res = res.json()
+
+        home_projection = res["home_score"]
+        away_projection = res["away_score"]
+
         return jsonify({
-            'home_id': 5,
-            'away_id': 6,
-            'home_name': 'Ohio State',
-            'away_name': 'Baylor',
-            'home_projection': 69,
-            'away_projection': 55
+            'home_id': home_team.id,
+            'away_id': away_team.id,
+            'home_name': home_team.name,
+            'away_name': away_team.name,
+            'home_projection': home_projection,
+            'away_projection': away_projection
         })
 
 
