@@ -6,6 +6,7 @@ from datetime import datetime
 from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
+from sportsreference.ncaab.teams import Teams
 
 app = Flask(__name__)
 CORS(app)
@@ -16,6 +17,20 @@ db = SQLAlchemy(app)
 
 # pep8 moves this line to the top, but we need db to be declared first
 from models import Game, Team  # nopep8
+
+# Create "flask seed" command which seeds the database with all teams and games.
+@app.cli.command("seed")
+def seed_database():
+    print("Adding seed data to the database.")
+    teams = list(Teams(2019))
+    teams.sort(key=lambda x: x.name)
+    for team in teams:
+        new_team = Team(name=team.name)
+        db.session.add(new_team)
+    try:
+        db.session.commit()
+    except:
+        db.session.rollback()
 
 
 @app.route("/")
@@ -97,10 +112,10 @@ def projections():
 def teams():
     try:
         teams = Team.query.all()
+        return jsonify([t.serialize() for t in teams])
         # Todo: Return actual data from database
         # Right now it is empty, so we're returning dummy data
-        # return jsonify([t.serialize() for t in teams])
-        return jsonify([{"id": 1, "name": "Gonazaga"}, {"id": 2, "name": "Duke"}, {"id": 3, "name": "Kansas"}, {"id": 4, "name": "Oregon"}, {"id": 5, "name": "Ohio State"}, {"id": 6, "name": "Baylor"}])
+        # return jsonify([{"id": 1, "name": "Gonazaga"}, {"id": 2, "name": "Duke"}, {"id": 3, "name": "Kansas"}, {"id": 4, "name": "Oregon"}, {"id": 5, "name": "Ohio State"}, {"id": 6, "name": "Baylor"}])
     except Exception as e:
         return(str(e))
 
