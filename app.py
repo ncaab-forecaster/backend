@@ -115,27 +115,28 @@ def projections():
                             db.session.rollback()
                     
                     print("000ooof")
-                    data = {
-                        "year": dt.today().year,
-                        "month": dt.today().month,
-                        "day": dt.today().day,
-                        "home_name": home_team.name,
-                        "home_rank": float(rankings.get(home_team.id.lower(), 0)),
-                        "away_name": away_team.name,
-                        "away_rank": float(rankings.get(away_team.id.lower(), 0))
-                    }
+                    if home_team and away_team:
+                        data = {
+                            "year": dt.today().year,
+                            "month": dt.today().month,
+                            "day": dt.today().day,
+                            "home_name": home_team.name,
+                            "home_rank": float(rankings.get(home_team.id.lower(), 0)),
+                            "away_name": away_team.name,
+                            "away_rank": float(rankings.get(away_team.id.lower(), 0))
+                        }
 
-                    res = requests.post(
-                        "http://ncaab.herokuapp.com/", data=json.dumps(data))
-                    res = res.json()
+                        res = requests.post(
+                            "http://ncaab.herokuapp.com/", data=json.dumps(data))
+                        res = res.json()
 
-                    home_projection = res["home_score"]
-                    away_projection = res["away_score"]
+                        home_projection = res["home_score"]
+                        away_projection = res["away_score"]
 
-                    new_game = Game(
-                        date=date, home=home_team.id, away=away_team.id, home_projection=home_projection, away_projection=away_projection)
-                    db.session.add(new_game)
-                    games.append(new_game)
+                        new_game = Game(
+                            date=date, home=home_team.id, away=away_team.id, home_projection=home_projection, away_projection=away_projection)
+                        db.session.add(new_game)
+                        games.append(new_game)
 
             # TODO: Test this out...
             # Update yesterday's games with the scores
