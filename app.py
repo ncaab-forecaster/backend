@@ -69,6 +69,12 @@ def projections():
         games = db.session.query(Game).filter(
             Game.date > today_start, Game.date < today_end).all()
 
+        all_games = db.session.query(Game).all()
+
+        if len(all_games) > 9500:
+            db.session.query(Game).delete()
+            db.session.commit()
+
         # If today's games have not been retrieved yet then do so from sports
         # And get the projected score from the data science API
         if len(games) == 0:
@@ -178,8 +184,6 @@ def projections():
         away_team = db.session.query(Team).filter(
             Team.id == away).first()
 
-        print(home_team)
-        print(away_team)
         data = {
             "year": dt.today().year,
             "month": dt.today().month,
