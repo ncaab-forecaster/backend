@@ -70,8 +70,10 @@ def projections():
             Game.date > today_start, Game.date < today_end).all()
 
         all_games = db.session.query(Game).all()
+        print("hi")
 
         if len(all_games) > 9500:
+            print("oops")
             db.session.query(Game).delete()
             db.session.commit()
 
