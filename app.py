@@ -113,7 +113,8 @@ def projections():
                                 Team.name == game["away_name"]).first()
                         except:
                             db.session.rollback()
-
+                    
+                    print("000ooof")
                     data = {
                         "year": dt.today().year,
                         "month": dt.today().month,
@@ -202,6 +203,7 @@ def projections():
         home_projection = res["home_score"]
         away_projection = res["away_score"]
 
+        print("ummmmm")
         return jsonify({
             'home_id': home_team.id,
             'away_id': away_team.id,
