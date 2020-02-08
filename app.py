@@ -70,10 +70,8 @@ def projections():
             Game.date > today_start, Game.date < today_end).all()
 
         all_games = db.session.query(Game).all()
-        print("hi")
 
         if len(all_games) > 9500:
-            print("oops")
             db.session.query(Game).delete()
             db.session.commit()
 
@@ -168,6 +166,7 @@ def projections():
                 Team.id == game["home_id"]).first()
             away_team = db.session.query(Team).filter(
                 Team.id == game["away_id"]).first()
+            print("oof")
             game["home_name"] = home_team.name
             game["away_name"] = away_team.name
             games_with_names.append(game)
@@ -185,7 +184,7 @@ def projections():
             Team.id == home).first()
         away_team = db.session.query(Team).filter(
             Team.id == away).first()
-
+        print("ooooof")
         data = {
             "year": dt.today().year,
             "month": dt.today().month,
